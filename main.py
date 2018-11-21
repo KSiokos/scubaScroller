@@ -3,78 +3,76 @@ import random
 import math
 import time
 
-# -- Global Contants
+# -- Global Constants
 
 WIDTH = 900
 HEIGHT = 900
-FPS = 40
+FPS = 60
+
+# -- Global Variable
+PAUSE = False
+ANTIDOTES = 3
+DEPTH = 0
+PLASTICS = 0
 
 # -- Colours
 
-BLACK = (0,0,0)
-WHITE = (255,255,255)
-BLUE = (50,50,255)
-YELLOW = (255,255,0)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+BLUE = (50, 50, 255)
+YELLOW = (255, 255, 0)
 BRIGHTRED = (255, 0, 0)
 DARKRED = (200, 0, 0)
 OCEANBLUE = (51, 153, 255)
 DARKGOGREEN = (0, 153, 76)
-BRIGHTGOGREEN =(0, 204, 102)
+BRIGHTGOGREEN = (0, 204, 102)
 
 # -- Initialise Pygame
-pygame.init()
-# -- Blank Screen
-size = (900,900)
-pause = False
-stinganti = 3
-depth = 0
-plasticcollect = 0
 
-screen = pygame.display.set_mode(size)
-screen_rect = screen.get_rect()
+pygame.init()                                           # Initialises pygame
+screen = pygame.display.set_mode((WIDTH, HEIGHT))       # Creates screen with given width & height
+pygame.display.set_caption("Scuba Scroller")            # Title of new window/screen
 
-##blackrocks = pygame.image.load("BlackRocks(SS).png").convert_alpha()
-##y = 0
-##rocks = pygame.image.load("Rock(SS).png").convert_alpha()
-##y2 = 0
-
-backround = pygame.image.load("oceangradient.png").convert_alpha()
-player_sinking = pygame.image.load("ScubaDiver(Sinking)2.png").convert_alpha()
-player_sinkingRIGHT = pygame.image.load("ScubaDiver(Sinking)RIGHT2.png").convert_alpha()
-player_neutral = pygame.image.load("ScubaDiver(Neutral)2.png").convert_alpha()
-player_neutralRIGHT = pygame.image.load("ScubaDiver(Neutral)RIGHT2.png").convert_alpha()
-jellyfishbasic_neutral = pygame.image.load("SmallJellyFish(Neutral).png").convert_alpha()
-bottle = pygame.image.load("Bottle.png").convert_alpha()
-blackrocks1 = pygame.image.load("BlackRocks(SS)PART1.png").convert_alpha()
-blackrocks2 = pygame.image.load("BlackRocks(SS)PART2.png").convert_alpha()
-blackrocks3 = pygame.image.load("BlackRocks(SS)PART3.png").convert_alpha()
-blackrocks4 = pygame.image.load("BlackRocks(SS)PART4.png").convert_alpha()
-greyrocks1 = pygame.image.load("Rock(SS)PART1.png").convert_alpha()
-greyrocks2 = pygame.image.load("Rock(SS)PART2.png").convert_alpha()
-greyrocks3 = pygame.image.load("Rock(SS)PART3.png").convert_alpha()
-greyrocks4 = pygame.image.load("Rock(SS)PART4.png").convert_alpha()
+# -- Assets
+backround = pygame.image.load("assets/background.png").convert_alpha()
+playerSinkingLeft = pygame.image.load("assets/player/playerSinkingLeft.png").convert_alpha()
+playerSinkingRight = pygame.image.load("assets/player/playerSinkingRight.png").convert_alpha()
+playerLeft = pygame.image.load("assets/player/playerLeft.png").convert_alpha()
+playerRight = pygame.image.load("assets/player/playerRight.png").convert_alpha()
+jellyFishRed = pygame.image.load("assets/jellyFish/red.png").convert_alpha()
+bottle = pygame.image.load("assets/plastics/bottle.png").convert_alpha()
+blackrocks1 = pygame.image.load("assets/blackRocks/blackRocks1.png").convert_alpha()
+blackrocks2 = pygame.image.load("assets/blackRocks/blackRocks2.png").convert_alpha()
+blackrocks3 = pygame.image.load("assets/blackRocks/blackRocks3.png").convert_alpha()
+blackrocks4 = pygame.image.load("assets/blackRocks/blackRocks4.png").convert_alpha()
+greyrocks1 = pygame.image.load("assets/greyRocks/greyRocks1.png").convert_alpha()
+greyrocks2 = pygame.image.load("assets/greyRocks/greyRocks2.png").convert_alpha()
+greyrocks3 = pygame.image.load("assets/greyRocks/greyRocks3.png").convert_alpha()
+greyrocks4 = pygame.image.load("assets/greyRocks/greyRocks4.png").convert_alpha()
 
 
+# -- Functions
 
-# -- Title of new window/screen
-pygame.display.set_caption("Scuba Scroller")
+# -- 
 def quitgame():
     pygame.quit()
-    quit()
 
+# --
 def game_over():
     screen.fill(BLACK)
     screen.blit(backround, (0,0))
+    
+    # Create function for fonts usage throughout the code
+
     text = pygame.font.SysFont('bubblegums', 50, True, False).render("GAME OVER",True,WHITE)
     screen.blit(text, [220,400])
-    text1 = pygame.font.SysFont('bubblegums', 20, True, False).render("You reached " + '%0.0f'%depth + "m",True,WHITE)
+    text1 = pygame.font.SysFont('bubblegums', 20, True, False).render("You reached " + '%0.0f'%DEPTH + "m",True,WHITE)
     screen.blit(text1, [305,470])
-    text1 = pygame.font.SysFont('bubblegums', 20, True, False).render("You cleaned up " + str(plasticcollect) + ' bottles',True,WHITE)
+    text1 = pygame.font.SysFont('bubblegums', 20, True, False).render("You cleaned up " + str(PLASTICS) + ' bottles',True,WHITE)
     screen.blit(text1, [230,505])
     pygame.display.flip()
     time.sleep(3)
     quitgame()
-##    game_intro()
 
 def button( x, y, width, height, inactivecolour, activecolour, action=None):
     mouse = pygame.mouse.get_pos()
@@ -88,19 +86,16 @@ def button( x, y, width, height, inactivecolour, activecolour, action=None):
         pygame.draw.rect(screen, inactivecolour, (x,y,width,height))
 
 def unpause():
-    global pause
-    pause = False
+    global PAUSE
+    PAUSE = False
 
 def paused():
 
-    while pause:
+    while PAUSE:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                quit()
 
-##        screen.fill(BLACK)
-##        screen.blit(backround, (0,0))
         text = pygame.font.SysFont('bubblegums', 45, True, False).render("Paused",True,WHITE)
         screen.blit(text, [325,400])
 
@@ -122,20 +117,19 @@ def game_intro():
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                done = True
+                pygame.quit()
 
-        screen.fill(BLACK)
         screen.blit(backround, (0,0))
-        text = pygame.font.SysFont('bubblegums',45, True, False).render("Scuba Scroller",True,WHITE)
+        text = pygame.font.SysFont('bubblegums', 45, True, False).render("Scuba Scroller", True, WHITE)
         screen.blit(text, [170,400])
 
-        button( 275, 500, 100, 50, DARKGOGREEN, BRIGHTGOGREEN,game_loop)
-        button( 535, 500, 100, 50, DARKRED, BRIGHTRED,quitgame)
+        button(275, 500, 100, 50, DARKGOGREEN, BRIGHTGOGREEN, game_loop)
+        button(535, 500, 100, 50, DARKRED, BRIGHTRED, quitgame)
 
-        text1 = pygame.font.SysFont('bubblegums', 24, True, False).render("Play",True,WHITE)
-        screen.blit(text1, [278, 510])
+        playButton = pygame.font.SysFont('bubblegums', 24, True, False).render("Play", True,WHITE)
+        screen.blit(playButton, [278, 510])
 
-        text2 = pygame.font.SysFont('bubblegums', 25, True, False).render("Quit",True,WHITE)
+        text2 = pygame.font.SysFont('bubblegums', 25, True, False).render("Quit", True, WHITE)
         screen.blit(text2, [540, 510])
 
         pygame.display.flip()
@@ -144,75 +138,57 @@ def make_new_jelly(number):
     for i in range(number):
         JB = JellyBasic()
         all_sprites_list.add(JB)
-        jellybasicgroup.add(JB)
+        jellyFishGroup.add(JB)
 
 def make_new_plastic(number):
     for i in range(number):
         P = Plastic()
         all_sprites_list.add(P)
-        plasticgroup.add(P)
+        plasticsGroup.add(P)
 
-# - Classes
-# -- Define the class invader which is a sprite
+# -- Class Definition
+
+# -- Player Class
 class Player(pygame.sprite.Sprite):
     #Define the constructor for player
     def __init__(self):
-        #Call the sprite constructor
-        super().__init__()
-        #Create a sprite and fill it with colour
-        self.image = pygame.Surface([10, 10])
-        self.image.fill(WHITE)
-        # Set the position of the sprite
-        self.image.set_colorkey(WHITE)
-        # Draw the player
-        self.image = player_sinking
-        # Fetch the rectangle object that has the dimensions of the image.
+        super().__init__()                                          # Call the sprite constructor
+        self.image = pygame.Surface([128, 128])
+        self.image = playerSinkingLeft                                 # Draw the player
         self.rect = self.image.get_rect()
-        # Object starting position
         self.rect.x = 425
         self.rect.y = 100
-
     def MoveRight(self, pixels):
         self.rect.x += pixels
-        self.image = player_sinkingRIGHT
+        self.image = playerSinkingRight
         self.mask = pygame.mask.from_surface(self.image)
-
     def MoveLeft(self, pixels):
         self.rect.x -= pixels
-        self.image = player_sinking
+        self.image = playerSinkingLeft
         self.mask = pygame.mask.from_surface(self.image)
-
     def MoveUp(self, pixels):
         self.rect.y -= pixels
-        self.image = player_neutral
+        self.image = playerLeft
         self.mask = pygame.mask.from_surface(self.image)
-
     def MoveDown(self, pixels):
         self.rect.y += pixels
-        self.image = player_sinking
+        self.image = playerSinkingLeft
         self.mask = pygame.mask.from_surface(self.image)
 
+# -- Player Object
+player = Player()
+
+# -- JellyFish Class
 class JellyBasic(pygame.sprite.Sprite):
-    #Define the constructor for player
     def __init__(self):
-        #Call the sprite constructor
-        super().__init__()
-        #Create a sprite and fill it with colour
-        self.image = pygame.Surface([30, 40])
-        self.image.fill(WHITE)
-        # Set the position of the sprite
-        self.image.set_colorkey(WHITE)
-        # Draw the player
-        self.image = jellyfishbasic_neutral
-        # Fetch the rectangle object that has the dimensions of the image.
+        super().__init__() 
+        self.image = pygame.Surface([128, 128])
+        self.image = jellyFishRed
         self.rect = self.image.get_rect()
-        # Object starting position
         self.rect.x = random.randrange(WIDTH - self.rect.width)
         self.rect.y = random.randrange(1400, 1550)
         self.speedy = random.randrange(2, 5)
         self.mask = pygame.mask.from_surface(self.image)
-
-# - Jellfish creation update function
     def update(self):
         self.rect.y -= self.speedy
         if self.rect.bottom < -10:
@@ -220,27 +196,24 @@ class JellyBasic(pygame.sprite.Sprite):
             self.rect.y = random.randrange(1000, 1100)
             self.speedy = random.randrange(2, 5)
 
+# -- JellyFish Object
+jelly = JellyBasic()
+
+# -- JellyFish Group
+jellyFishGroup = pygame.sprite.Group()
+
+
+# -- Plastics Class
 class Plastic(pygame.sprite.Sprite):
-    #Define the constructor for player
-    def __init__(self):
-        #Call the sprite constructor
+    def __init__(self, plasticType):
         super().__init__()
-        #Create a sprite and fill it with colour
-        self.image = pygame.Surface([30, 40])
-        self.image.fill(WHITE)
-        # Set the position of the sprite
-        self.image.set_colorkey(WHITE)
-        # Draw the player
-        self.image = bottle
-        # Fetch the rectangle object that has the dimensions of the image.
+        self.image = pygame.Surface([25,70])
+        self.image = plasticType
         self.rect = self.image.get_rect()
-        # Object starting position
         self.rect.x = random.randrange(WIDTH - self.rect.width)
         self.rect.y = random.randrange(2500, 2600)
         self.speedy = random.randrange(2, 6)
         self.mask = pygame.mask.from_surface(self.image)
-
-    # - Bottle creation update function
     def update(self):
         self.rect.y -= self.speedy
         if self.rect.bottom < -200:
@@ -248,29 +221,41 @@ class Plastic(pygame.sprite.Sprite):
             self.rect.y = random.randrange(3000, 3100)
             self.speedy = random.randrange(2, 6)
 
+# -- Plactics Object
+bottle = Plastic(bottle)
+
+# -- Plastics Group
+plasticsGroup = pygame.sprite.Group()
+plasticsGroup.add(bottle)
+
+# -- GreyRocks Class
 class greyRocks(pygame.sprite.Sprite):
     def __init__(self, image, y):
         super().__init__()
         self.image = image
         self.rect = self.image.get_rect()
-        # Object starting position
         self.rect.x = 0
         self.rect.y = y
         self.speedy = 3
         self.originY = y
         self.mask = pygame.mask.from_surface(self.image)
-
     def update(self):
         self.rect.y -= self.speedy
         if self.rect.bottom <= 0:
             self.rect.y = 900
 
+# -- GreyRocks Objects
+greyRocksSegment1 = greyRocks(greyrocks1, 0)
+greyRocksSegment2 = greyRocks(greyrocks2, 300)
+greyRocksSegment3 = greyRocks(greyrocks3, 600)
+greyRocksSegment4 = greyRocks(greyrocks4, 900)
+
+# -- BlackRocks Class
 class blackRocks(pygame.sprite.Sprite):
     def __init__(self, image, y):
         super().__init__()
         self.image = image
         self.rect = self.image.get_rect()
-        # Object starting position
         self.rect.x = 0
         self.rect.y = y
         self.speedy = 1
@@ -282,15 +267,13 @@ class blackRocks(pygame.sprite.Sprite):
         if self.rect.bottom <= 0:
             self.rect.y = 900
 
+# -- BlackRocks Objects
 blackRocksSegment1 = blackRocks(blackrocks1, 0)
 blackRocksSegment2 = blackRocks(blackrocks2, 300)
 blackRocksSegment3 = blackRocks(blackrocks3, 600)
-blackRocksSegment4 = blackRocks(blackrocks4, 900) #change 1 to 4 and add image
-greyRocksSegment1 = greyRocks(greyrocks1, 0)
-greyRocksSegment2 = greyRocks(greyrocks2, 300)
-greyRocksSegment3 = greyRocks(greyrocks3, 600)
-greyRocksSegment4 = greyRocks(greyrocks4, 900) #change 1 to 4 and add image
+blackRocksSegment4 = blackRocks(blackrocks4, 900)
 
+# -- Rocks Group
 RocksGroup = pygame.sprite.Group()
 RocksGroup.add(blackRocksSegment1)
 RocksGroup.add(blackRocksSegment2)
@@ -300,25 +283,9 @@ RocksGroup.add(greyRocksSegment1)
 RocksGroup.add(greyRocksSegment2)
 RocksGroup.add(greyRocksSegment3)
 RocksGroup.add(greyRocksSegment4)
-# Create a list of the jelly fish (basic) objects
-jellybasicgroup = pygame.sprite.Group()
-plasticgroup = pygame.sprite.Group()
-
-# -- Creates a list of all sprites
-all_sprites_list = pygame.sprite.Group()
-
-player = Player()
-jelly = JellyBasic()
-plastic = Plastic()
-
-# Add the player to the list of objects
-all_sprites_list.add(player)
 
 make_new_jelly(6)
 make_new_plastic(1)
-
-# -- Exit game flag set to false
-done = False
 
 # -- Manages how fast screen refreshes
 clock = pygame.time.Clock()
@@ -333,56 +300,43 @@ def blit_alpha(target, source, location, opacity):
         target.blit(temp, location)
 
 def game_loop():
-    ### -- Game Loop
-
     # - Global Variables
-    global pause
-    global stinganti
-    global depth
-    global plasticcollect
-
-    # - The clock ticks over
-    clock.tick(FPS)
+    global PAUSE, ANTIDOTES, DEPTH, PLASTICS
+    clock.tick(FPS)                                                     # The clock ticks over
 
     # -- Exit game flag set to false
     done = False
 
     while not done:
-
-            # -- User input and controls
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
-            elif event.type == pygame.KEYDOWN: # - a key is down
+                quitgame()
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     done = True
                     game_over()
                 if event.key == pygame.K_p:
-                    pause = True
+                    PAUSE = True
                     paused()
                     
+        # -- Setup Background
         screen.blit(backround, (0,0))
+
+        # -- Setup and move Rocks
         RocksGroup.draw(screen)
         RocksGroup.update()
-        
+
+        # - Information on screen (DEPTH, sting antidote etc)        
         font = pygame.font.SysFont('calibri', 16, True, False)
-        text = font.render('Sting Antidote Left: ' + str(stinganti), True, WHITE)
+        text = font.render('Sting Antidote Left: ' + str(ANTIDOTES), True, WHITE)
         screen.blit(text, [50, 50])
         font = pygame.font.SysFont('AGENTORANGE', 55, True, False)
-        depthText = font.render('%0.0f'%depth + 'm', True, WHITE)
+        depthText = font.render('%0.0f'%DEPTH + 'm', True, WHITE)
         blit_alpha(screen, depthText, (375,200), 128)
         font = pygame.font.SysFont('calibri', 16, True, False)
-        text = font.render('Clean Up: ' + str(plasticcollect), True, WHITE)
+        text = font.render('Clean Up: ' + str(PLASTICS), True, WHITE)
         screen.blit(text, [50, 70])
-
-        all_sprites_list.draw(screen)
-
-
-                # -- Sprite Update
-        all_sprites_list.update()
-
-        # -- flip display to reveal new position of objects
 
         # - Player movements
         keys = pygame.key.get_pressed()
@@ -396,7 +350,8 @@ def game_loop():
             player.MoveDown(4)
 
         # - Game over requirements
-        if stinganti <= 0:
+        if ANTIDOTES <= 0:
+            done = True
             game_over()
 
         # - Player constraints
@@ -409,48 +364,22 @@ def game_loop():
         if player.rect.top  < 30:
             player.rect.top = 30
 
-            #End If
-        collects = pygame.sprite.spritecollide(player, plasticgroup, True, pygame.sprite.collide_mask)
+        collects = pygame.sprite.spritecollide(player, plasticsGroup, True, pygame.sprite.collide_mask)
         for collect in collects:
             make_new_plastic(1)
-
-        for i in range (0, len(collects)):
-            plasticcollect = plasticcollect + 1
-
+            PLASTICS = PLASTICS + 1
+            
         # - If player hits jellyfish make new one and remove hit one off screen
-        hits = pygame.sprite.spritecollide(player, jellybasicgroup, True, pygame.sprite.collide_mask)
+        hits = pygame.sprite.spritecollide(player, jellyFishGroup, True, pygame.sprite.collide_mask)
         for hit in hits:
             make_new_jelly(1)
-
-        # - For how many jellyfish player hits remove sting antidote
-        for i in range (0, len(hits)):
-            stinganti = stinganti - 1
-
+            ANTIDOTES = ANTIDOTES - 1
+            
         # - Depth increases as clock ticks
-        depth = depth + 0.1
-       
-##        # - Infinate scrolling black rocks
-##        global y
-##        rel_y = y % blackrocks.get_rect().height
-##        screen.blit(blackrocks, (0,rel_y - blackrocks.get_rect().height))
-##        if rel_y < HEIGHT:
-##            screen.blit(blackrocks, (0, rel_y))
-##        y -= 1
-##
-##        # - Infinate scrolling grey rocks
-##        global y2
-##        rel_y2 = y2 % rocks.get_rect().height
-##        screen.blit(rocks, (0,rel_y2 - rocks.get_rect().height))
-##        if rel_y2 < HEIGHT:
-##            screen.blit(rocks, (0, rel_y2))
-##        y2 -= 3
+        DEPTH = DEPTH + 0.1
 
-        # - Information on screen (depth, sting antidote etc)
-
-     
+        # -- flip display to reveal new position of objects
         pygame.display.flip()
-
-        #End While - End of game loop
 
 
 game_intro()

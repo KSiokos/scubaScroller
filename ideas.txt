@@ -9,6 +9,7 @@ AI implemented
 	Also jellyfish gradually move faster as time increases 
 	Player can be moved faster after time progresses? 
 Depth changes according to where play is on screen
+	change from current system related to ticks
 Projectiles (bubbles stop creatures from moving)
 Then MASK collision with bubbles causes them to pop and releases jellyfish unless 10 seconds pass 
 Make plastic collection more useful
