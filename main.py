@@ -8,6 +8,8 @@ import time
 WIDTH = 900
 HEIGHT = 900
 FPS = 60
+DEPTHRATE = 0.03
+USERDEPTHRATE = 0.01
 
 # -- Global Variable
 PAUSE = False
@@ -39,7 +41,22 @@ playerSinkingLeft = pygame.image.load("assets/player/playerSinkingLeft.png").con
 playerSinkingRight = pygame.image.load("assets/player/playerSinkingRight.png").convert_alpha()
 playerLeft = pygame.image.load("assets/player/playerLeft.png").convert_alpha()
 playerRight = pygame.image.load("assets/player/playerRight.png").convert_alpha()
+# Jelly Fish Images
 jellyFishRed = pygame.image.load("assets/jellyFish/red.png").convert_alpha()
+jellyFishRedMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+
+jellyFishBlue = pygame.image.load("assets/jellyFish/blue.png").convert_alpha()
+jellyFishBlueMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+
+jellyFishGreen = pygame.image.load("assets/jellyFish/green.png").convert_alpha()
+jellyFishGreenMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+
+jellyFishPurple = pygame.image.load("assets/jellyFish/purple.png").convert_alpha()
+jellyFishPurpleMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+
+jellyFishBrown = pygame.image.load("assets/jellyFish/brown.png").convert_alpha()
+jellyFishBrownMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+
 bottle = pygame.image.load("assets/plastics/bottle.png").convert_alpha()
 blackrocks1 = pygame.image.load("assets/blackRocks/blackRocks1.png").convert_alpha()
 blackrocks2 = pygame.image.load("assets/blackRocks/blackRocks2.png").convert_alpha()
@@ -61,9 +78,7 @@ def quitgame():
 def game_over():
     screen.fill(BLACK)
     screen.blit(backround, (0,0))
-    
     # Create function for fonts usage throughout the code
-
     text = pygame.font.SysFont('bubblegums', 50, True, False).render("GAME OVER",True,WHITE)
     screen.blit(text, [220,400])
     text1 = pygame.font.SysFont('bubblegums', 20, True, False).render("You reached " + '%0.0f'%DEPTH + "m",True,WHITE)
@@ -77,7 +92,6 @@ def game_over():
 def button( x, y, width, height, inactivecolour, activecolour, action=None):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
-
     if x+width > mouse[0] > x and y+height > mouse[1] > y:
         pygame.draw.rect(screen, activecolour, (x,y,width,height))
         if click[0] == 1 and action != None:
@@ -136,17 +150,17 @@ def game_intro():
 
 def make_new_jelly(number):
     for i in range(number):
-        JB = JellyBasic()
+        JB = Jelly()
         all_sprites_list.add(JB)
         jellyFishGroup.add(JB)
 
-def make_new_plastic(number):
+def make_new_plastic(number, plasticType):
     for i in range(number):
-        P = Plastic()
+        P = Plastic(plasticType)
         all_sprites_list.add(P)
         plasticsGroup.add(P)
 
-# -- Class Definition
+# -- Class Definitions
 
 # -- Player Class
 class Player(pygame.sprite.Sprite):
@@ -175,39 +189,45 @@ class Player(pygame.sprite.Sprite):
         self.image = playerSinkingLeft
         self.mask = pygame.mask.from_surface(self.image)
 
-# -- Player Object
-player = Player()
-
 # -- JellyFish Class
-class JellyBasic(pygame.sprite.Sprite):
+class Jelly(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__() 
         self.image = pygame.Surface([128, 128])
-        self.image = jellyFishRed
+        self.jellyColours = [jellyFishRed, jellyFishBlue, jellyFishGreen, jellyFishPurple, jellyFishBrown]
+        self.jellyColoursMove = [jellyFishRedMove, jellyFishBlueMove, jellyFishGreenMove, jellyFishPurpleMove, jellyFishBrownMove]
+        self.jellyType = 0
+        self.refresh = 40
+        self.movement = self.refresh
+        self.image = self.jellyColours[self.jellyType]
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(WIDTH - self.rect.width)
         self.rect.y = random.randrange(1400, 1550)
         self.speedy = random.randrange(2, 5)
         self.mask = pygame.mask.from_surface(self.image)
     def update(self):
+        # if (DEPTH%50 == 0) and (self.jellyType < 5):
+        #     self.jellyType += 1
+        self.movement -= 1
+        if self.movement > (self.refresh/2):
+            self.image = self.jellyColoursMove[self.jellyType]
+            self.mask = pygame.mask.from_surface(self.image)
+        else:
+            self.image = self.jellyColours[self.jellyType]
+            self.mask = pygame.mask.from_surface(self.image)
+        if self.movement == 0:
+            self.movement = self.refresh
         self.rect.y -= self.speedy
+        self.rect.x += random.randrange(-1, 2)
         if self.rect.bottom < -10:
             self.rect.x = random.randrange(WIDTH - self.rect.width)
             self.rect.y = random.randrange(1000, 1100)
             self.speedy = random.randrange(2, 5)
 
-# -- JellyFish Object
-jelly = JellyBasic()
-
-# -- JellyFish Group
-jellyFishGroup = pygame.sprite.Group()
-
-
 # -- Plastics Class
 class Plastic(pygame.sprite.Sprite):
     def __init__(self, plasticType):
         super().__init__()
-        self.image = pygame.Surface([25,70])
         self.image = plasticType
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(WIDTH - self.rect.width)
@@ -220,13 +240,6 @@ class Plastic(pygame.sprite.Sprite):
             self.rect.x = random.randrange(WIDTH - self.rect.width)
             self.rect.y = random.randrange(3000, 3100)
             self.speedy = random.randrange(2, 6)
-
-# -- Plactics Object
-bottle = Plastic(bottle)
-
-# -- Plastics Group
-plasticsGroup = pygame.sprite.Group()
-plasticsGroup.add(bottle)
 
 # -- GreyRocks Class
 class greyRocks(pygame.sprite.Sprite):
@@ -244,12 +257,6 @@ class greyRocks(pygame.sprite.Sprite):
         if self.rect.bottom <= 0:
             self.rect.y = 900
 
-# -- GreyRocks Objects
-greyRocksSegment1 = greyRocks(greyrocks1, 0)
-greyRocksSegment2 = greyRocks(greyrocks2, 300)
-greyRocksSegment3 = greyRocks(greyrocks3, 600)
-greyRocksSegment4 = greyRocks(greyrocks4, 900)
-
 # -- BlackRocks Class
 class blackRocks(pygame.sprite.Sprite):
     def __init__(self, image, y):
@@ -265,17 +272,29 @@ class blackRocks(pygame.sprite.Sprite):
     def update(self):
         self.rect.y -= self.speedy
         if self.rect.bottom <= 0:
-            self.rect.y = 900
+            self.rect.y = 900                        
 
-# -- BlackRocks Objects
-blackRocksSegment1 = blackRocks(blackrocks1, 0)
+# -- Groups
+all_sprites_list = pygame.sprite.Group()                # All Sprites Group
+jellyFishGroup = pygame.sprite.Group()                  # JellyFish Group
+plasticsGroup = pygame.sprite.Group()                   # Plastics Group
+RocksGroup = pygame.sprite.Group()                      # Rocks Group
+
+# -- Objects
+player = Player()                                       # Player Object
+make_new_jelly(6)                                       # JellyFish Objects
+make_new_plastic(1, bottle)                             # Plastic Objects
+greyRocksSegment1 = greyRocks(greyrocks1, 0)            # GreyRocks Objects
+greyRocksSegment2 = greyRocks(greyrocks2, 300)
+greyRocksSegment3 = greyRocks(greyrocks3, 600)
+greyRocksSegment4 = greyRocks(greyrocks4, 900)
+blackRocksSegment1 = blackRocks(blackrocks1, 0)         # BlackRocks Objects
 blackRocksSegment2 = blackRocks(blackrocks2, 300)
 blackRocksSegment3 = blackRocks(blackrocks3, 600)
 blackRocksSegment4 = blackRocks(blackrocks4, 900)
 
-# -- Rocks Group
-RocksGroup = pygame.sprite.Group()
-RocksGroup.add(blackRocksSegment1)
+all_sprites_list.add(player)                            # Player added to Group
+RocksGroup.add(blackRocksSegment1)                      # Rocks added to Group
 RocksGroup.add(blackRocksSegment2)
 RocksGroup.add(blackRocksSegment3)
 RocksGroup.add(blackRocksSegment4)
@@ -283,9 +302,6 @@ RocksGroup.add(greyRocksSegment1)
 RocksGroup.add(greyRocksSegment2)
 RocksGroup.add(greyRocksSegment3)
 RocksGroup.add(greyRocksSegment4)
-
-make_new_jelly(6)
-make_new_plastic(1)
 
 # -- Manages how fast screen refreshes
 clock = pygame.time.Clock()
@@ -338,6 +354,10 @@ def game_loop():
         text = font.render('Clean Up: ' + str(PLASTICS), True, WHITE)
         screen.blit(text, [50, 70])
 
+        # -- Draw and Update All Sprites
+        all_sprites_list.draw(screen)
+        all_sprites_list.update()
+
         # - Player movements
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
@@ -346,8 +366,10 @@ def game_loop():
             player.MoveRight(4)
         if keys[pygame.K_w]:
             player.MoveUp(4)
+            DEPTH -= USERDEPTHRATE
         if keys[pygame.K_s]:
             player.MoveDown(4)
+            DEPTH += USERDEPTHRATE
 
         # - Game over requirements
         if ANTIDOTES <= 0:
@@ -366,7 +388,7 @@ def game_loop():
 
         collects = pygame.sprite.spritecollide(player, plasticsGroup, True, pygame.sprite.collide_mask)
         for collect in collects:
-            make_new_plastic(1)
+            make_new_plastic(1, bottle)
             PLASTICS = PLASTICS + 1
             
         # - If player hits jellyfish make new one and remove hit one off screen
@@ -376,7 +398,7 @@ def game_loop():
             ANTIDOTES = ANTIDOTES - 1
             
         # - Depth increases as clock ticks
-        DEPTH = DEPTH + 0.1
+        DEPTH += DEPTHRATE
 
         # -- flip display to reveal new position of objects
         pygame.display.flip()
