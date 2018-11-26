@@ -16,6 +16,9 @@ PAUSE = False
 ANTIDOTES = 3
 DEPTH = 0
 PLASTICS = 0
+BUBBLE_LIMIT = 3
+test_countdown = 50
+JELLY_KILL_TIME = 50
 
 # -- Colours
 
@@ -37,27 +40,46 @@ pygame.display.set_caption("Scuba Scroller")            # Title of new window/sc
 
 # -- Assets
 backround = pygame.image.load("assets/background.png").convert_alpha()
+
+# Player
 playerSinkingLeft = pygame.image.load("assets/player/playerSinkingLeft.png").convert_alpha()
 playerSinkingRight = pygame.image.load("assets/player/playerSinkingRight.png").convert_alpha()
 playerLeft = pygame.image.load("assets/player/playerLeft.png").convert_alpha()
 playerRight = pygame.image.load("assets/player/playerRight.png").convert_alpha()
+playerShootRight = pygame.image.load("assets/player/playerSinkingRight.png").convert_alpha()
+playerShootLeft = pygame.image.load("assets/player/playerSinkingLeft.png").convert_alpha()
+playerShootTop = pygame.image.load("assets/player/playerSinkingLeft.png").convert_alpha()
+playerShootBottom = pygame.image.load("assets/player/playerSinkingLeft.png").convert_alpha()
 # Jelly Fish Images
 jellyFishRed = pygame.image.load("assets/jellyFish/red.png").convert_alpha()
 jellyFishRedMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+jellyFishRedInBubble = pygame.image.load("assets/jellyFish/red.png").convert_alpha()
+jellyFishRedMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
 
 jellyFishBlue = pygame.image.load("assets/jellyFish/blue.png").convert_alpha()
 jellyFishBlueMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+jellyFishBlueInBubble = pygame.image.load("assets/jellyFish/blue.png").convert_alpha()
+jellyFishBlueMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
 
 jellyFishGreen = pygame.image.load("assets/jellyFish/green.png").convert_alpha()
 jellyFishGreenMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+jellyFishGreenInBubble = pygame.image.load("assets/jellyFish/green.png").convert_alpha()
+jellyFishGreenMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
 
 jellyFishPurple = pygame.image.load("assets/jellyFish/purple.png").convert_alpha()
 jellyFishPurpleMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+jellyFishPurpleInBubble = pygame.image.load("assets/jellyFish/purple.png").convert_alpha()
+jellyFishPurpleMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
 
 jellyFishBrown = pygame.image.load("assets/jellyFish/brown.png").convert_alpha()
 jellyFishBrownMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+jellyFishBrownInBubble = pygame.image.load("assets/jellyFish/brown.png").convert_alpha()
+jellyFishBrownMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
 
+# Plastics
 bottle = pygame.image.load("assets/plastics/bottle.png").convert_alpha()
+
+# Rocks
 blackrocks1 = pygame.image.load("assets/blackRocks/blackRocks1.png").convert_alpha()
 blackrocks2 = pygame.image.load("assets/blackRocks/blackRocks2.png").convert_alpha()
 blackrocks3 = pygame.image.load("assets/blackRocks/blackRocks3.png").convert_alpha()
@@ -188,6 +210,44 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += pixels
         self.image = playerSinkingLeft
         self.mask = pygame.mask.from_surface(self.image)
+    def shootRight(self):
+        oldState = self.image
+        self.image = playerShootRight
+        self.mask = pygame.mask.from_surface(self.image)
+        countdown = test_countdown
+        while countdown > 0:
+            countdown -= 1
+        self.image = oldState
+        self.mask = pygame.mask.from_surface(self.image)
+    def shootLeft(self):
+        oldState = self.image
+        self.image = playerShootLeft
+        self.mask = pygame.mask.from_surface(self.image)
+        countdown = test_countdown
+        while countdown > 0:
+            countdown -= 1
+        self.image = oldState
+        self.mask = pygame.mask.from_surface(self.image)
+    def shootTop(self):
+        oldState = self.image
+        self.image = playerShootTop
+        self.mask = pygame.mask.from_surface(self.image)
+        countdown = test_countdown
+        while countdown > 0:
+            countdown -= 1
+        self.image = oldState
+        self.mask = pygame.mask.from_surface(self.image)
+    def shootBottom(self):
+        oldState = self.image
+        self.image = playerShootBottom
+        self.mask = pygame.mask.from_surface(self.image)
+        countdown = test_countdown
+        while countdown > 0:
+            countdown -= 1
+        self.image = oldState
+        self.mask = pygame.mask.from_surface(self.image)
+    def getPos(self):
+        return [self.rect.x, self.rect.y]
 
 # -- JellyFish Class
 class Jelly(pygame.sprite.Sprite):
@@ -196,6 +256,8 @@ class Jelly(pygame.sprite.Sprite):
         self.image = pygame.Surface([128, 128])
         self.jellyColours = [jellyFishRed, jellyFishBlue, jellyFishGreen, jellyFishPurple, jellyFishBrown]
         self.jellyColoursMove = [jellyFishRedMove, jellyFishBlueMove, jellyFishGreenMove, jellyFishPurpleMove, jellyFishBrownMove]
+        self.jellyColoursInBubble = [jellyFishRedInBubble, jellyFishBlueInBubble, jellyFishGreenInBubble, jellyFishPurpleInBubble, jellyFishBrownMoveInBubble]
+        self.jellyColoursMoveInBubble = [jellyFishRedMoveInBubble, jellyFishBlueMoveInBubble, jellyFishGreenMoveInBubble, jellyFishPurpleMoveInBubble, jellyFishBrownMoveInBubble]
         self.jellyType = 0
         self.refresh = 40
         self.movement = self.refresh
@@ -205,24 +267,45 @@ class Jelly(pygame.sprite.Sprite):
         self.rect.y = random.randrange(1400, 1550)
         self.speedy = random.randrange(2, 5)
         self.mask = pygame.mask.from_surface(self.image)
+        self.inBubble = False
+        self.killTime = JELLY_KILL_TIME
     def update(self):
-        # if (DEPTH%50 == 0) and (self.jellyType < 5):
-        #     self.jellyType += 1
-        self.movement -= 1
-        if self.movement > (self.refresh/2):
-            self.image = self.jellyColoursMove[self.jellyType]
+        if inBubble == True:
+            self.killTime -= 1
+            self.image = self.jellyColoursInBubble[self.jellyType]
             self.mask = pygame.mask.from_surface(self.image)
+            self.movement -= 1
+            if self.movement > (self.refresh/2):
+                self.image = self.jellyColoursMoveInBubble[self.jellyType]
+                self.mask = pygame.mask.from_surface(self.image)
+            else:
+                self.image = self.jellyColoursInBubble[self.jellyType]
+                self.mask = pygame.mask.from_surface(self.image)
+            if self.movement == 0:
+                self.movement = self.refresh
+            self.rect.x += random.randrange(-1, 2)
+            if self.killTime == 0:
+                self.inBubble = False
         else:
-            self.image = self.jellyColours[self.jellyType]
-            self.mask = pygame.mask.from_surface(self.image)
-        if self.movement == 0:
-            self.movement = self.refresh
-        self.rect.y -= self.speedy
-        self.rect.x += random.randrange(-1, 2)
+            self.movement -= 1
+            if self.movement > (self.refresh/2):
+                self.image = self.jellyColoursMove[self.jellyType]
+                self.mask = pygame.mask.from_surface(self.image)
+            else:
+                self.image = self.jellyColours[self.jellyType]
+                self.mask = pygame.mask.from_surface(self.image)
+            if self.movement == 0:
+                self.movement = self.refresh
+            self.rect.y -= self.speedy
+            self.rect.x += random.randrange(-1, 2)
         if self.rect.bottom < -10:
             self.rect.x = random.randrange(WIDTH - self.rect.width)
             self.rect.y = random.randrange(1000, 1100)
             self.speedy = random.randrange(2, 5)
+    def inBubble():
+        self.inBubble = True
+    def bubbleState():
+        return self.inBubble
 
 # -- Plastics Class
 class Plastic(pygame.sprite.Sprite):
@@ -240,6 +323,27 @@ class Plastic(pygame.sprite.Sprite):
             self.rect.x = random.randrange(WIDTH - self.rect.width)
             self.rect.y = random.randrange(3000, 3100)
             self.speedy = random.randrange(2, 6)
+
+# -- Bubble Class
+class Bubble(pygame.sprite.Sprite):
+    def __init__(self, x, y, directionX, directionY):
+        super().__init__()
+        self.image = pygame.Surface([20, 20])
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.directionX = directionX
+        self.directionY = directionY
+    def update(self):
+        if (self.rect.x > WIDTH) or (self.rect.x < 0) or (self.rect.y < 0) or (self.rect.y > HEIGHT):
+            self.kill()
+        self.rect.x += self.directionX
+        self.rect.y += self.directionY
+        if self.directionX == 0:
+            self.rect.y += random.randrange(-1, 2)
+        if self.directionY == 0:
+            self.rect.x += random.randrange(-1, 2)
 
 # -- GreyRocks Class
 class greyRocks(pygame.sprite.Sprite):
@@ -279,6 +383,7 @@ all_sprites_list = pygame.sprite.Group()                # All Sprites Group
 jellyFishGroup = pygame.sprite.Group()                  # JellyFish Group
 plasticsGroup = pygame.sprite.Group()                   # Plastics Group
 RocksGroup = pygame.sprite.Group()                      # Rocks Group
+BubbleGroup = pygame.sprite.Group()                     # Bubble Group
 
 # -- Objects
 player = Player()                                       # Player Object
@@ -358,8 +463,9 @@ def game_loop():
         all_sprites_list.draw(screen)
         all_sprites_list.update()
 
-        # - Player movements
+        # - Player Controls
         keys = pygame.key.get_pressed()
+        # Movement
         if keys[pygame.K_a]:
             player.MoveLeft(4)
         if keys[pygame.K_d]:
@@ -370,6 +476,37 @@ def game_loop():
         if keys[pygame.K_s]:
             player.MoveDown(4)
             DEPTH += USERDEPTHRATE
+        # Shooting
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    if len(BubbleGroup) < BUBBLE_LIMIT:
+                        [x, y] = player.getPos()
+                        bubble = Bubble(x, y, 1, 0)
+                        BubbleGroup.add(bubble)
+                        all_sprites_list.add(bubble)
+                    player.shootRight()
+                elif event.key == pygame.K_LEFT:
+                    if len(BubbleGroup) < BUBBLE_LIMIT:
+                        [x, y] = player.getPos()
+                        bubble = Bubble(x, y, -1, 0)
+                        BubbleGroup.add(bubble)
+                        all_sprites_list.add(bubble)
+                    player.shootLeft()
+                elif event.key == pygame.K_UP:
+                    if len(BubbleGroup) < BUBBLE_LIMIT:
+                        [x, y] = player.getPos()
+                        bubble = Bubble(x, y, 0, -1)
+                        BubbleGroup.add(bubble)
+                        all_sprites_list.add(bubble)
+                    player.shootTop()
+                elif event.key == pygame.K_DOWN:
+                    if len(BubbleGroup) < BUBBLE_LIMIT:
+                        [x, y] = player.getPos()
+                        bubble = Bubble(x, y, 0, 1)
+                        BubbleGroup.add(bubble)
+                        all_sprites_list.add(bubble)
+                    player.shootBottom()
 
         # - Game over requirements
         if ANTIDOTES <= 0:

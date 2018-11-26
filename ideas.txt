@@ -7,12 +7,44 @@ AI implemented
 	Depth control creature creation (e.g. green jellyfish etc)
 		E.g. 1000m shark spawns going across the screen
 	Also jellyfish gradually move faster as time increases 
-	Player can be moved faster after time progresses? 
-Depth changes according to where play is on screen
-	change from current system related to ticks
+	Player can be moved faster after time progresses?
 Projectiles (bubbles stop creatures from moving)
 Then MASK collision with bubbles causes them to pop and releases jellyfish unless 10 seconds pass 
 Make plastic collection more useful
 Collisions with rocks 
 	Health goes down 
+Adding JellyFish Types at each interval of 50m depth
+
+
+Images Needed:
+	- Player with gun x4
+	- Small bubble
+	- JellyFish in Bubble x5
+	- JellyFishMove in Bubble x5
+
+- Player Class
+	KON		- Add 4 new images
+	DONE	- Add functionality for direction keys
+	DONE	- Image changes back after bubble created
+	- collision with JellyFishInABubble
+		- Kill JellyFishInABubble
+		- JellyFishKilled score
+
+- Class for bubble
+	DONE 	- small bubble image 
+	DONE	- object created when key direction pressed from coordinates of gun
+	DONE	- moves bubble in the direction of key pressed
+	DONE	- wiggle effect
+	- collision with JellyFish
+	- collision with Rocks
+	DONE	- 1 Bubble per key press
+	DONE	- Kill bubbles off screen
+	DONE	- Limit total bubbles on screen
+	KON		- Change limit according to depth or score or plastics collected
+
+- Collision JellyFish & Bubble object
+	DONE	- JellyFish image changed to JellyFishInABubble
+	DONE	- JellyFish still wiggling
+	DONE	- Bubble disappears after JELLY_KILL_TIME if player does not collide
+	
 
