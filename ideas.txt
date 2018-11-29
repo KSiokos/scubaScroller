@@ -18,24 +18,37 @@ Adding JellyFish Types at each interval of 50m depth
 
 Images Needed:
 	- Player with gun x4
-	- Small bubble
+	DONE - Small bubble
 	- JellyFish in Bubble x5
 	- JellyFishMove in Bubble x5
+	- Player in shock
+	- Health Bar images x100
+
+
+- Health Bar
+	- Load individual images
+	- Add all images hbx.png to array healthBar
+	- Global variable HEALTH
+		- Initialised to 100
+		- 
+
+
+
 
 - Player Class
 	KON		- Add 4 new images
 	DONE	- Add functionality for direction keys
 	DONE	- Image changes back after bubble created
-	- collision with JellyFishInABubble
-		- Kill JellyFishInABubble
-		- JellyFishKilled score
+	DONE 	- collision with JellyFishInABubble
+				DONE	- Kill JellyFishInABubble
+				- JellyFishKilled score
 
 - Class for bubble
 	DONE 	- small bubble image 
 	DONE	- object created when key direction pressed from coordinates of gun
 	DONE	- moves bubble in the direction of key pressed
 	DONE	- wiggle effect
-	- collision with JellyFish
+	DONE - collision with JellyFish
 	- collision with Rocks
 	DONE	- 1 Bubble per key press
 	DONE	- Kill bubbles off screen
