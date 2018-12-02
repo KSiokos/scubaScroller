@@ -563,7 +563,7 @@ def game_loop():
             # z = y[0]
             # ans = z.pop()
             jellyFishBubbled = list(bubbleJellyCollision.values())[0].pop()
-            if not jellyFishBubbled.getBubble:
+            if not jellyFishBubbled.getBubble():
                 jellyFishBubbled.setBubble()
         
         # Keep 6 JellyFish alive at all times
