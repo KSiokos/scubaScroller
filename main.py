@@ -2,33 +2,8 @@ import pygame
 import random
 from math import *
 import time
-# from helpers import *
-
-# -- Global Constants
-
-WIDTH = 900
-HEIGHT = 900
-FPS = 60
-DEPTHRATE = 0.03
-USERDEPTHRATE = 0.01
-DONE = False
-REGENERATE = 0.09
-
-# -- Global Variable
-PAUSE = False
-ANTIDOTES = 3
-DEPTH = 0
-PLASTICS = 0
-BUBBLE_LIMIT = 3
-test_countdown = 50
-JELLY_KILL_TIME = 50
-JELLYID = 0
-HEALTH = 320
-RED = 0
-GREEN = 255
 
 # -- Colours
-
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (50, 50, 255)
@@ -38,6 +13,36 @@ DARKRED = (200, 0, 0)
 OCEANBLUE = (51, 153, 255)
 DARKGOGREEN = (0, 153, 76)
 BRIGHTGOGREEN = (0, 204, 102)
+
+# -- Global Constants
+WIDTH = 900
+HEIGHT = 900
+FPS = 60
+DEPTHRATE = 0.03
+USERDEPTHRATE = 0.01
+REGENERATE = 0.09
+JELLY_DAMAGE = 40
+ROCKS_DAMAGE = 2
+MARGIN_LR = 20
+MARGIN_TB = 30
+PLAYER_MARGINS = [-MARGIN_LR, MARGIN_TB, WIDTH+MARGIN_LR, HEIGHT+MARGIN_TB]        # left, top, right, bottom
+BUBBLE_LIMIT = 3
+PLAYER_MOVE_TIME = 50
+JELLY_KILL_TIME = 50
+INITIAL_DEPTH = 0
+INITIAL_PLASTICS = 0
+INITIAL_JELLYID = 0
+INITIAL_HEALTH = 320
+INITIAL_RED = 0
+INITIAL_GREEN = 255
+
+# -- Global Variable
+DEPTH = INITIAL_DEPTH
+PLASTICS = INITIAL_PLASTICS
+JELLYID = INITIAL_JELLYID
+HEALTH = INITIAL_HEALTH
+RED = INITIAL_RED
+GREEN = INITIAL_GREEN
 
 # -- Initialise Pygame
 
@@ -84,15 +89,6 @@ jellyFishBrownMove = pygame.image.load("assets/jellyFish/red-move.png").convert_
 jellyFishBrownInBubble = pygame.image.load("assets/jellyFish/brown.png").convert_alpha()
 jellyFishBrownMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
 
-# Health Bar
-# hb1 = pygame.image.load("assets/healthBar/hb1.png").convert_alpha()
-# .
-# .
-# .
-# healthBar = [hb1, hb2, hb3, hb4, ...]
-
-
-
 # Plastics
 bottle = pygame.image.load("assets/plastics/bottle.png").convert_alpha()
 
@@ -120,57 +116,17 @@ def make_new_plastic(number, plasticType):
         all_sprites_list.add(P)
         plasticsGroup.add(P)
 
-def quitgame():
-    pygame.quit()
-
-# --
-def game_over():
-    screen.fill(BLACK)
-    screen.blit(backround, (0,0))
-    # Create function for fonts usage throughout the code
-    text = pygame.font.SysFont('bubblegums', 50, True, False).render("GAME OVER",True,WHITE)
-    screen.blit(text, [220,400])
-    text1 = pygame.font.SysFont('bubblegums', 20, True, False).render("You reached " + '%0.0f'%DEPTH + "m",True,WHITE)
-    screen.blit(text1, [305,470])
-    text1 = pygame.font.SysFont('bubblegums', 20, True, False).render("You cleaned up " + str(PLASTICS) + ' bottles',True,WHITE)
-    screen.blit(text1, [230,505])
-    pygame.display.flip()
-    time.sleep(3)
-    quitgame()
-
-def button( x, y, width, height, inactivecolour, activecolour, action=None):
+def button(x, y, width, height, inactivecolour, activecolour):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
     if x+width > mouse[0] > x and y+height > mouse[1] > y:
-        pygame.draw.rect(screen, activecolour, (x,y,width,height))
-        if click[0] == 1 and action != None:
-            action()
+        pygame.draw.rect(screen, activecolour, (x, y, width, height))
+        if click[0] == 1:
+            return True
+        else:
+            return False
     else:
-        pygame.draw.rect(screen, inactivecolour, (x,y,width,height))
-
-def unpause():
-    global PAUSE
-    PAUSE = False
-
-def paused():
-    while PAUSE:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-
-        text = pygame.font.SysFont('bubblegums', 45, True, False).render("Paused",True,WHITE)
-        screen.blit(text, [325,400])
-
-        button( 275, 500, 160, 50, DARKGOGREEN, BRIGHTGOGREEN,unpause)
-        button( 535, 500, 100, 50, DARKRED, BRIGHTRED,quitgame)
-
-        text1 = pygame.font.SysFont('bubblegums', 24, True, False).render("Resume",True,WHITE)
-        screen.blit(text1, [278, 510])
-
-        text2 = pygame.font.SysFont('bubblegums', 25, True, False).render("Quit",True,WHITE)
-        screen.blit(text2, [540, 510])
-
-        pygame.display.flip()
+        pygame.draw.rect(screen, inactivecolour, (x, y, width, height))
 
 def blit_alpha(target, source, location, opacity):
         x = location[0]
@@ -180,32 +136,36 @@ def blit_alpha(target, source, location, opacity):
         temp.blit(source, (0, 0))
         temp.set_alpha(opacity)        
         target.blit(temp, location)
-# -- 
 
-def game_intro():
+def damage(cause):
+    global HEALTH, RED, GREEN
+    if cause == "rocks":
+        if HEALTH > ROCKS_DAMAGE:
+            HEALTH -= ROCKS_DAMAGE
+        greenDecrease = ROCKS_DAMAGE/1.25
+        redIncrease = 255 - greenDecrease
+        if GREEN >= greenDecrease:
+            GREEN -= greenDecrease
+        if RED <= redIncrease:
+            RED += greenDecrease
+    if cause == "jelly":
+        if HEALTH > JELLY_DAMAGE:
+            HEALTH -= JELLY_DAMAGE
+        greenDecrease = JELLY_DAMAGE/1.25
+        redIncrease = 255 - greenDecrease
+        if GREEN >= greenDecrease:
+            GREEN -= greenDecrease
+        if RED <= redIncrease:
+            RED += greenDecrease
 
-    intro = True
-
-    while intro:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-
-        screen.blit(backround, (0,0))
-        text = pygame.font.SysFont('bubblegums', 45, True, False).render("Scuba Scroller", True, WHITE)
-        screen.blit(text, [170,400])
-
-        button(275, 500, 100, 50, DARKGOGREEN, BRIGHTGOGREEN, game_loop)
-        button(535, 500, 100, 50, DARKRED, BRIGHTRED, quitgame)
-
-        playButton = pygame.font.SysFont('bubblegums', 24, True, False).render("Play", True,WHITE)
-        screen.blit(playButton, [278, 510])
-
-        text2 = pygame.font.SysFont('bubblegums', 25, True, False).render("Quit", True, WHITE)
-        screen.blit(text2, [540, 510])
-
-        pygame.display.flip()
-
+def regenrateHealth():
+    global HEALTH, RED, GREEN
+    if HEALTH < 320:
+        HEALTH += REGENERATE
+    if GREEN < 255:
+        GREEN += REGENERATE
+    if RED > 0:
+        RED -= REGENERATE
 
 # -- Class Definitions
 
@@ -239,7 +199,7 @@ class Player(pygame.sprite.Sprite):
         oldState = self.image
         self.image = playerShootRight
         self.mask = pygame.mask.from_surface(self.image)
-        countdown = test_countdown
+        countdown = PLAYER_MOVE_TIME
         while countdown > 0:
             countdown -= 1
         self.image = oldState
@@ -248,7 +208,7 @@ class Player(pygame.sprite.Sprite):
         oldState = self.image
         self.image = playerShootLeft
         self.mask = pygame.mask.from_surface(self.image)
-        countdown = test_countdown
+        countdown = PLAYER_MOVE_TIME
         while countdown > 0:
             countdown -= 1
         self.image = oldState
@@ -257,7 +217,7 @@ class Player(pygame.sprite.Sprite):
         oldState = self.image
         self.image = playerShootTop
         self.mask = pygame.mask.from_surface(self.image)
-        countdown = test_countdown
+        countdown = PLAYER_MOVE_TIME
         while countdown > 0:
             countdown -= 1
         self.image = oldState
@@ -266,14 +226,22 @@ class Player(pygame.sprite.Sprite):
         oldState = self.image
         self.image = playerShootBottom
         self.mask = pygame.mask.from_surface(self.image)
-        countdown = test_countdown
+        countdown = PLAYER_MOVE_TIME
         while countdown > 0:
             countdown -= 1
         self.image = oldState
         self.mask = pygame.mask.from_surface(self.image)
     def getPos(self):
         return [self.rect.x, self.rect.y]
-
+    def update(self):
+        if self.rect.right > PLAYER_MARGINS[2]:
+            self.rect.right = PLAYER_MARGINS[2]
+        if self.rect.left < PLAYER_MARGINS[0]:
+            self.rect.left = PLAYER_MARGINS[0]
+        if self.rect.bottom > PLAYER_MARGINS[3]:
+            self.rect.bottom = PLAYER_MARGINS[3]
+        if self.rect.top  < PLAYER_MARGINS[1]:
+            self.rect.top = PLAYER_MARGINS[1]
 # -- JellyFish Class
 class Jelly(pygame.sprite.Sprite):
     def __init__(self):
@@ -411,6 +379,7 @@ all_sprites_list = pygame.sprite.Group()                # All Sprites Group
 jellyFishGroup = pygame.sprite.Group()                  # JellyFish Group
 plasticsGroup = pygame.sprite.Group()                   # Plastics Group
 RocksGroup = pygame.sprite.Group()                      # Rocks Group
+greyRocksGroup = pygame.sprite.Group()                  # Grey Rocks Group
 BubbleGroup = pygame.sprite.Group()                     # Bubble Group
 
 # -- Objects
@@ -434,30 +403,132 @@ RocksGroup.add(greyRocksSegment1)
 RocksGroup.add(greyRocksSegment2)
 RocksGroup.add(greyRocksSegment3)
 RocksGroup.add(greyRocksSegment4)
+greyRocksGroup.add(greyRocksSegment1)
+greyRocksGroup.add(greyRocksSegment2)
+greyRocksGroup.add(greyRocksSegment3)
+greyRocksGroup.add(greyRocksSegment4)
 
 # -- Manages how fast screen refreshes
 clock = pygame.time.Clock()
 
-def game_loop():
-    # - Global Variables
-    global DONE, PAUSE, ANTIDOTES, DEPTH, PLASTICS, HEALTH, RED, GREEN
-    clock.tick(FPS)                                                     # The clock ticks over
-
-    # -- Exit game flag set to false
-    # DONE = False
-
-    while not DONE and not PAUSE:
+def game_intro():
+    intro = True
+    while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                DONE = True
-                quitgame()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    DONE = True
-                    game_over()
-                if event.key == pygame.K_p:
-                    PAUSE = True
-                    paused()
+                pygame.quit()
+
+        # Background
+        screen.blit(backround, (0,0))
+        
+        # Title
+        text = pygame.font.SysFont('bubblegums', 45, True, False).render("Scuba Scroller", True, WHITE)
+        screen.blit(text, [170,400])
+
+        # Play Button
+        playButton = button(275, 500, 100, 50, DARKGOGREEN, BRIGHTGOGREEN)
+        playText = pygame.font.SysFont('bubblegums', 24, True, False).render("Play", True, WHITE)
+        screen.blit(playText, [278, 510])
+        if playButton:
+            intro = False
+
+        # Quit Button
+        quitButton = button(535, 500, 100, 50, DARKRED, BRIGHTRED)
+        quitText = pygame.font.SysFont('bubblegums', 25, True, False).render("Quit", True, WHITE)
+        screen.blit(quitText, [540, 510])
+        if quitButton:
+            intro = False
+            pygame.quit()
+
+        pygame.display.flip()
+def paused():
+    pause = True
+    while pause:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        # Title
+        text = pygame.font.SysFont('bubblegums', 45, True, False).render("Paused",True,WHITE)
+        screen.blit(text, [325,400])
+
+        # Resume Button
+        resumeButton = button(275, 500, 160, 50, DARKGOGREEN, BRIGHTGOGREEN)
+        resumeText = pygame.font.SysFont('bubblegums', 24, True, False).render("Resume", True, WHITE)
+        screen.blit(resumeText, [278, 510])
+        if resumeButton:
+            pause = False
+
+        # Quit Button
+        quitButton = button(535, 500, 100, 50, DARKRED, BRIGHTRED)
+        quitText = pygame.font.SysFont('bubblegums', 25, True, False).render("Quit", True, WHITE)
+        screen.blit(quitText, [540, 510])
+        if quitButton:
+            pause = False
+            pygame.quit()
+
+        pygame.display.flip()        
+def game_over():
+    global DEPTH, PLASTICS, JELLYID, HEALTH, RED, GREEN
+    game = True
+    retry = False
+    while game:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        # Background
+        screen.blit(backround, (0,0))
+
+        # Title
+        titleText = pygame.font.SysFont('bubblegums', 50, True, False).render("GAME OVER",True,WHITE)
+        screen.blit(titleText, [220,400])
+
+        # Depth Reached
+        depthText = pygame.font.SysFont('bubblegums', 20, True, False).render("You reached " + '%0.0f'%DEPTH + "m",True,WHITE)
+        screen.blit(depthText, [305,470])
+
+        # Plastics Collected
+        plasticText = pygame.font.SysFont('bubblegums', 20, True, False).render("You cleaned up " + str(PLASTICS) + ' bottles',True,WHITE)
+        screen.blit(plasticText, [230,505])
+
+        # Jelly Popped
+
+        # Play Button
+        retryButton = button(275, 500, 100, 50, DARKGOGREEN, BRIGHTGOGREEN)
+        retryText = pygame.font.SysFont('bubblegums', 24, True, False).render("Retry", True, WHITE)
+        screen.blit(retryText, [278, 510])
+        if retryButton:
+            retry = True
+            game = False
+
+        # Quit Button
+        quitButton = button(535, 500, 100, 50, DARKRED, BRIGHTRED)
+        quitText = pygame.font.SysFont('bubblegums', 25, True, False).render("Quit", True, WHITE)
+        screen.blit(quitText, [540, 510])
+        if quitButton:
+            game = False
+            pygame.quit()
+
+        pygame.display.flip()
+    
+    DEPTH = INITIAL_DEPTH
+    PLASTICS = INITIAL_PLASTICS
+    JELLYID = INITIAL_JELLYID
+    HEALTH = INITIAL_HEALTH
+    RED = INITIAL_RED
+    GREEN = INITIAL_GREEN
+    return retry
+def game_loop():
+    # - Global Variables
+    global DEPTH, PLASTICS, HEALTH, RED, GREEN
+    clock.tick(FPS)                                                     # The clock ticks over
+    done = False
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                
                     
         # -- Setup Background
         screen.blit(backround, (0,0))
@@ -468,8 +539,6 @@ def game_loop():
 
         # - Information on screen (DEPTH, sting antidote etc)        
         font = pygame.font.SysFont('calibri', 16, True, False)
-        text = font.render('Sting Antidote Left: ' + str(ANTIDOTES), True, WHITE)
-        screen.blit(text, [50, 50])
         font = pygame.font.SysFont('AGENTORANGE', 55, True, False)
         depthText = font.render('%0.0f'%DEPTH + 'm', True, WHITE)
         blit_alpha(screen, depthText, (375,200), 128)
@@ -484,6 +553,9 @@ def game_loop():
         # -- Draw and Update All Sprites
         all_sprites_list.draw(screen)
         all_sprites_list.update()
+
+        # Update Player
+        player.update()
 
         # - Player Controls
         keys = pygame.key.get_pressed()
@@ -529,21 +601,14 @@ def game_loop():
                         BubbleGroup.add(bubble)
                         all_sprites_list.add(bubble)
                     player.shootBottom()
+                elif event.key == pygame.K_ESCAPE:
+                    done = True
+                elif event.key == pygame.K_p:
+                    paused()
 
         # - Game over requirements
-        if ANTIDOTES <= 0:
-            DONE = True
-            game_over()
-
-        # - Player constraints
-        if player.rect.right > WIDTH + 20:
-            player.rect.right = WIDTH + 20
-        if player.rect.left < -20:
-            player.rect.left = -20
-        if player.rect.bottom > HEIGHT + 30:
-            player.rect.bottom = HEIGHT + 30
-        if player.rect.top  < 30:
-            player.rect.top = 30
+        if HEALTH <= 0:
+            done = True
 
         # -- Collisions
 
@@ -553,6 +618,11 @@ def game_loop():
             make_new_plastic(1, bottle)
             PLASTICS = PLASTICS + 1
             
+        # Player and Rocks Collision
+        playerRockCollision = pygame.sprite.spritecollide(player, greyRocksGroup, False, pygame.sprite.collide_mask)
+        for everyRockCollision in playerRockCollision:
+            damage("rocks")
+
         # Player and JellyFish Collision 
         playerJellyCollision = pygame.sprite.spritecollide(player, jellyFishGroup, False, pygame.sprite.collide_mask)
         for jelly in playerJellyCollision:
@@ -560,13 +630,7 @@ def game_loop():
                 jelly.kill()
             else:
                 jellyFishGroup.remove(jelly)
-                if HEALTH > 20:
-                    HEALTH -= 20
-                if GREEN >= 16:
-                    GREEN -= 16
-                if RED <= 239:
-                    RED += 16
-
+                damage("jelly")
 
         # Bubble and JellyFish Collision
         bubbleJellyCollision = pygame.sprite.groupcollide(BubbleGroup, jellyFishGroup, True, False)
@@ -589,13 +653,7 @@ def game_loop():
         DEPTH += DEPTHRATE
 
         # - Health regenrates with time
-        if HEALTH < 320:
-            HEALTH += REGENERATE
-
-        if GREEN < 255:
-            GREEN += REGENERATE
-        if RED > 0:
-            RED -= REGENERATE
+        regenrateHealth()
 
         # -- flip display to reveal new position of objects
         pygame.display.flip()
@@ -603,3 +661,7 @@ def game_loop():
 
 game_intro()
 game_loop()
+retry = game_over()
+while retry:
+    game_loop()
+    retry = game_over()
