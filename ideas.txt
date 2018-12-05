@@ -1,36 +1,40 @@
+5-12-18
+-------
+
+DONE	- JellyFish Colours
+DONE	- Sway for plastics
+DONE	- Plastic collection image
+
 Project Ideas
 -------------
 
-High score system 
-	Leaderboard in main menu
-AI implemented 
-	Depth control creature creation (e.g. green jellyfish etc)
-		E.g. 1000m shark spawns going across the screen
-	Also jellyfish gradually move faster as time increases 
-	Player can be moved faster after time progresses?
-Projectiles (bubbles stop creatures from moving)
-Then MASK collision with bubbles causes them to pop and releases jellyfish unless 10 seconds pass 
-Make plastic collection more useful
-Collisions with rocks 
-	Health goes down 
-Adding JellyFish Types at each interval of 50m depth
+- High score system
+	- Leaderboard in main menu
+
+- AI implemented 
+	- Depth control creature creation (E.g. 1000m shark spawns going across the screen)
+	- Also jellyfish gradually move faster as time increases 
+	- Player can be moved faster after time progresses?
+
+- Make plastic collection more useful
+- Bubbling Jelly adds to score
+
+
+
+
+
+
 
 
 Images Needed:
 	- Player with gun x4
-	DONE - Small bubble
 	- JellyFish in Bubble x5
 	- JellyFishMove in Bubble x5
 	- Player in shock
-	- Health Bar images x100
 
 
-- Health Bar
-	- Load individual images
-	- Add all images hbx.png to array healthBar
-	- Global variable HEALTH
-		- Initialised to 100
-		- 
+
+
 
 
 
@@ -41,15 +45,15 @@ Images Needed:
 	DONE	- Image changes back after bubble created
 	DONE 	- collision with JellyFishInABubble
 				DONE	- Kill JellyFishInABubble
-				- JellyFishKilled score
+			- JellyFishKilled score
 
 - Class for bubble
 	DONE 	- small bubble image 
 	DONE	- object created when key direction pressed from coordinates of gun
 	DONE	- moves bubble in the direction of key pressed
 	DONE	- wiggle effect
-	DONE - collision with JellyFish
-	- collision with Rocks
+	DONE 	- collision with JellyFish
+	DONE	- collision with Rocks
 	DONE	- 1 Bubble per key press
 	DONE	- Kill bubbles off screen
 	DONE	- Limit total bubbles on screen
@@ -59,5 +63,3 @@ Images Needed:
 	DONE	- JellyFish image changed to JellyFishInABubble
 	DONE	- JellyFish still wiggling
 	DONE	- Bubble disappears after JELLY_KILL_TIME if player does not collide
-	
-
