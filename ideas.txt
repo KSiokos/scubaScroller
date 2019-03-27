@@ -8,16 +8,18 @@ DONE	- Plastic collection image
 Project Ideas
 -------------
 
-- High score system
-	- Leaderboard in main menu
+- Scores
+	Incorporate depth, jellyFish killed, Bottles collected
+	Leaderboard
+		List of high score
+		if high score beats leaderboard, append name
+		sort scores
 
 - AI implemented 
 	- Depth control creature creation (E.g. 1000m shark spawns going across the screen)
 	- Also jellyfish gradually move faster as time increases 
 	- Player can be moved faster after time progresses?
 
-- Make plastic collection more useful
-- Bubbling Jelly adds to score
 
 
 

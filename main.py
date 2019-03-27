@@ -1,6 +1,7 @@
 import pygame
 import random
 import time
+import json
 from math import *
 from assets import *
 from global_vars import *
@@ -41,15 +42,6 @@ def button(x, y, width, height, inactivecolour, activecolour):
     else:
         pygame.draw.rect(screen, inactivecolour, (x, y, width, height))
 
-def blit_alpha(target, source, location, opacity):
-        x = location[0]
-        y = location[1]
-        temp = pygame.Surface((source.get_width(), source.get_height())).convert()
-        temp.blit(target, (-x, -y))
-        temp.blit(source, (0, 0))
-        temp.set_alpha(opacity)        
-        target.blit(temp, location)
-
 def damage(cause):
     global HEALTH, RED, GREEN
     damage = 0
@@ -86,19 +78,86 @@ def regenrateHealth():
         RED -= REGENERATE
 
 def cleanSlate():
-    global DEPTH, PLASTICS, JELLYID, HEALTH, RED, GREEN
+    global SCORE, DEPTH, PLASTICS, JELLY_KILLED, JELLYID, HEALTH, RED, GREEN
     
     # Kill all sprites
     for each in all_sprites_list.sprites():
         each.kill()
     # Reset all global variables
+    SCORE = INITIAL_SCORE
     DEPTH = INITIAL_DEPTH
     PLASTICS = INITIAL_PLASTICS
     JELLYID = INITIAL_JELLYID
+    JELLY_KILLED = INITIAL_JELLY_KILLED
     HEALTH = INITIAL_HEALTH
     RED = INITIAL_RED
     GREEN = INITIAL_GREEN
     JELLY_TYPE = INITIAL_JELLY_TYPE
+
+def readScore():
+    localLeaderboard = []
+    with open('leaderboard.txt') as json_file:
+        scores = json.load(json_file)
+        for s in scores['newScores']:
+            temp = (s['name'], s['score'])
+            localLeaderboard.append(temp)
+        return localLeaderboard
+
+def pullScore(scoreEnd):
+    scores = readScore()
+    if scoreEnd == "high":
+        score = str(scores[0][1])
+        scoreText = titleFont.render("Highest Score", True, WHITE)
+        screen.blit(scoreText, [100,150])
+        scoreNumber = titleFont.render(score,True,WHITE)
+        screen.blit(scoreNumber, [700,150])
+    elif scoreEnd == "low":
+        # score = str(scores[4][1])
+        score = scores[4][1]
+        return score
+
+def pushScore(username, userscore):
+    # Get original scores from file
+    currentScores = readScore()
+    # print(currentScores)
+
+    # Create new structure
+    leaderboard = {}
+    leaderboard['newScores'] = []
+    i = 0
+    newname = username
+    newscore = userscore
+
+    # Append to new list until position found
+    for score in currentScores:
+        if userscore < score[1]:
+            leaderboard['newScores'].append({'name': score[0],'score': score[1]})
+            i += 1
+    # Add updated list to new structure
+    while i <= 4:
+        leaderboard['newScores'].append({'name': newname,'score': newscore})
+        newname = currentScores[i][0]
+        newscore = currentScores[i][1]
+        i += 1
+    # print(leaderboard)
+
+    with open('leaderboard.txt', 'w') as outfile:
+        json.dump(leaderboard, outfile)
+
+def displayTop5Scores(display):
+    scores = readScore()
+    if display == "leaderboard":
+        x = 300
+        y = 300
+        yStep = 100
+    elif display == "game_over":
+        x = 300
+        y = 300
+        yStep = 50
+    for score in scores:
+        scoreText = pygame.font.SysFont('calibri', 32, True, False).render(score[0] + "             " + str(score[1]), True, WHITE)
+        screen.blit(scoreText, [x,y])
+        y += yStep
 
 # def addText(font, size, location, text):
 
@@ -113,8 +172,15 @@ def game_intro():
         screen.blit(backround, (0,0))
         
         # Title
-        text = pygame.font.SysFont('bubblegums', 45, True, False).render("Scuba Scroller", True, WHITE)
-        screen.blit(text, [170,400])
+        titleText = titleFont.render("Scuba Scroller", True, WHITE)
+        screen.blit(titleText, [170,400])
+
+        # Play Button
+        leaderboardButton = button(275, 600, 100, 50, DARKGOGREEN, BRIGHTGOGREEN)
+        leaderboardText = pygame.font.SysFont('bubblegums', 24, True, False).render("Leaderboard", True, WHITE)
+        screen.blit(leaderboardText, [278, 610])
+        if leaderboardButton:
+            leaderboard()
 
         # Play Button
         playButton = button(275, 500, 100, 50, DARKGOGREEN, BRIGHTGOGREEN)
@@ -160,45 +226,87 @@ def paused():
 
         pygame.display.flip()        
 def game_over():
+    # Global Variables
     global DEPTH, PLASTICS, JELLYID, HEALTH, RED, GREEN
-    game = True
+    # Flags
+    game_over = True
     retry = False
-    while game:
+    updateLeaderboard = False
+    # Highscore variables
+    myScore = int(SCORE)
+    lowestScore = pullScore("low")
+    # Condition to update highscores
+    if myScore >= lowestScore:
+        updateLeaderboard = True
+        name = ''
+    # Main Loop
+    while game_over:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+            # Event for updating highscore
+            if updateLeaderboard == True:
+                if event.type == pygame.KEYDOWN:
+                    # Return key finalises name and resets name variable to empty
+                    if event.key == pygame.K_RETURN:
+                        # Update leaderboard.txt
+                        pushScore(name, myScore)
+                        name = ''
+                        updateLeaderboard = False
+                    elif event.key == pygame.K_BACKSPACE:
+                        name = name[:-1]
+                    else:
+                        # Limits name to hold 3 characters
+                        if len(name) < 3:
+                            name += event.unicode
 
         # Background
         screen.blit(backround, (0,0))
 
+        # Update Leaderboard
+        if updateLeaderboard == True:
+            # Draw textbox on screen for name
+            pygame.draw.rect(screen, WHITE, (450, 450, 100, 50))
+            nameText = pygame.font.SysFont(None, 20, True, False).render(name, True, BLACK)
+            screen.blit(nameText, [475, 475])
+
         # Title
-        titleText = pygame.font.SysFont('bubblegums', 50, True, False).render("GAME OVER",True,WHITE)
-        screen.blit(titleText, [220,400])
+        titleText = titleFont.render("GAME OVER", True, WHITE)
+        screen.blit(titleText, [225, 75])
+
+        # Main Score
+        scoreText = pygame.font.SysFont('bubblegums', 20, True, False).render(str("{:06d}".format(int(SCORE))), True, WHITE)
+        screen.blit(scoreText, [305,170])
 
         # Depth Reached
-        depthText = pygame.font.SysFont('bubblegums', 20, True, False).render("You reached " + '%0.0f'%DEPTH + "m",True,WHITE)
+        depthText = pygame.font.SysFont('bubblegums', 20, True, False).render("You reached " + '%0.0f'%DEPTH + "m",True, WHITE)
         screen.blit(depthText, [305,470])
 
         # Plastics Collected
-        plasticText = pygame.font.SysFont('bubblegums', 20, True, False).render("You cleaned up " + str(PLASTICS) + ' bottles',True,WHITE)
+        plasticText = pygame.font.SysFont('bubblegums', 20, True, False).render("You cleaned up " + str(PLASTICS) + ' bottles',True, WHITE)
         screen.blit(plasticText, [230,505])
 
         # Jelly Popped
+        jellyText = pygame.font.SysFont('bubblegums', 20, True, False).render("You killed " + str(JELLY_KILLED) + ' JellyFish',True, WHITE)
+        screen.blit(jellyText, [230,605])
+        
+        # High Scores
+        displayTop5Scores("game_over")
 
-        # Play Button
-        retryButton = button(275, 500, 100, 50, DARKGOGREEN, BRIGHTGOGREEN)
+        # Retry Button
+        retryButton = button(275, 800, 100, 50, DARKGOGREEN, BRIGHTGOGREEN)
         retryText = pygame.font.SysFont('bubblegums', 24, True, False).render("Retry", True, WHITE)
-        screen.blit(retryText, [278, 510])
+        screen.blit(retryText, [278, 810])
         if retryButton:
             retry = True
-            game = False
+            game_over = False
 
         # Quit Button
-        quitButton = button(535, 500, 100, 50, DARKRED, BRIGHTRED)
+        quitButton = button(535, 800, 100, 50, DARKRED, BRIGHTRED)
         quitText = pygame.font.SysFont('bubblegums', 25, True, False).render("Quit", True, WHITE)
-        screen.blit(quitText, [540, 510])
+        screen.blit(quitText, [540, 810])
         if quitButton:
-            game = False
+            game_over = False
             pygame.quit()
 
         pygame.display.flip()
@@ -206,14 +314,14 @@ def game_over():
     return retry
 def game_loop():
     # - Global Variables
-    global DEPTH, PLASTICS, HEALTH, RED, GREEN, JELLY_TYPE
+    global SCORE, DEPTH, PLASTICS, HEALTH, RED, GREEN, JELLY_TYPE, JELLY_KILLED
     clock.tick(FPS)                                                     # The clock ticks over
     done = False
     player = Player()                                       # Player Object
     all_sprites_list.add(player)
     agentOrange = pygame.font.SysFont('AGENTORANGE', 55, True, False)
     incremented = False
-    counter = 50
+    counter = 50    
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -227,9 +335,8 @@ def game_loop():
         RocksGroup.update()
 
         # - Information on screen
-        depthFont = pygame.font.SysFont('AGENTORANGE', 55, True, False)
-        depthText = depthFont.render('%0.0f'%DEPTH + 'm', True, WHITE)
-        blit_alpha(screen, depthText, (375, 200), 128)
+        depthText = agentOrange.render('%0.0f'%DEPTH + 'm', True, GREY)
+        screen.blit(depthText, (375, 200))
         font = pygame.font.SysFont('calibri', 32, True, False)
         screen.blit(bottle, [40, 50])
         plasticsText = font.render('x' + str(PLASTICS), True, WHITE)
@@ -240,6 +347,10 @@ def game_loop():
         pygame.draw.rect(screen, healthBarColour, [290, 40, HEALTH, 20])
         healthBarText = pygame.font.SysFont('calibri', 26, True, False).render(str(int(100*HEALTH/INITIAL_HEALTH)) + "%", True, WHITE)
         screen.blit(healthBarText, [435,42])
+
+        # Score
+        scoreText = agentOrange.render(str("{:06d}".format(int(SCORE))), True, WHITE)
+        screen.blit(scoreText, [730, 50])
 
         # -- Draw and Update All Sprites
         all_sprites_list.draw(screen)
@@ -326,6 +437,7 @@ def game_loop():
         for jelly in playerJellyCollision:
             if jelly.getBubble():
                 jelly.kill()
+                JELLY_KILLED += 1
             else:
                 jellyFishGroup.remove(jelly)
                 damage("jelly")
@@ -363,7 +475,7 @@ def game_loop():
         # Change Jelly Type
         if (DEPTH > TUTORIAL_DEPTH):
             if ((int(DEPTH)-TUTORIAL_DEPTH)%JELLY_CHANGE_INTERVAL == 0) and incremented == False:
-                if JELLY_TYPE < 5:
+                if JELLY_TYPE < 4:
                     JELLY_TYPE += 1
                 else:
                     JELLY_TYPE = 0
@@ -378,7 +490,38 @@ def game_loop():
         # - Health regenrates with time
         regenrateHealth()
 
+        # Update score
+        SCORE = DEPTH + JELLY_KILLED*100 + PLASTICS*200
+
         # -- flip display to reveal new position of objects
+        pygame.display.flip()
+def leaderboard():
+    leaderboard = True
+    while leaderboard:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        # Background
+        screen.blit(backround, (0,0))
+        
+        # Title
+        titleText = titleFont.render("Leaderboard", True, WHITE)
+        screen.blit(titleText, [200,75])
+
+        # Back Button
+        backButton = button(400, 800, 100, 50, DARKGOGREEN, BRIGHTGOGREEN)
+        backText = pygame.font.SysFont('bubblegums', 24, True, False).render("Back", True, WHITE)
+        screen.blit(backText, [403, 810])
+        if backButton:
+            leaderboard = False
+
+        # Display high scores on the screen
+        pullScore("high")
+
+        # Display top 5 scores on the screen
+        displayTop5Scores("leaderboard")
+
         pygame.display.flip()
 
 game_intro()

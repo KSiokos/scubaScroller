@@ -8,6 +8,11 @@ pygame.display.set_caption("Scuba Scroller")            # Title of new window/sc
 backround = pygame.image.load("assets/background.png").convert_alpha()
 bubble = pygame.image.load("assets/bubble.png").convert_alpha()
 
+# Fonts
+pygame.font.init()
+titleFont = pygame.font.Font("assets/fonts/BUBBLEGUMS.TTF", 45)
+subTitleFont = pygame.font.Font("assets/fonts/BUBBLEGUMS.TTF", 22)
+
 # Player
 playerSinkingLeft = pygame.image.load("assets/player/playerSinkingLeft.png").convert_alpha()
 playerSinkingRight = pygame.image.load("assets/player/playerSinkingRight.png").convert_alpha()

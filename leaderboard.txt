@@ -1,0 +1,1 @@
+{"newScores": [{"name": "kon", "score": 650}, {"name": "jon", "score": 478}, {"name": "bob", "score": 475}, {"name": "adi", "score": 300}, {"name": "rad", "score": 110}]}

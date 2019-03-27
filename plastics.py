@@ -9,7 +9,7 @@ class Plastic(pygame.sprite.Sprite):
         super().__init__()
         self.image = plasticType
         self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(100, WIDTH-100)
+        self.rect.x = random.randrange(200, WIDTH-200)
         self.rect.y = random.randrange(1100, 1600)
         self.speedy = random.randrange(2, 6)
         self.speedx = random.randrange(2, 12)
