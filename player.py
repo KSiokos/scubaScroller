@@ -11,7 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.Surface([128, 128])
         self.image = playerSinkingLeft                                 # Draw the player
         self.rect = self.image.get_rect()
-        self.rect.x = 425
+        self.rect.x = 410
         self.rect.y = 100
     def MoveRight(self, pixels):
         self.rect.x += pixels

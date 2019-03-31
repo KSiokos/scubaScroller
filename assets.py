@@ -25,28 +25,28 @@ playerShootBottom = pygame.image.load("assets/player/playerSinkingLeft.png").con
 # Jelly Fish Images
 jellyFishRed = pygame.image.load("assets/jellyFish/red.png").convert_alpha()
 jellyFishRedMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
-jellyFishRedInBubble = pygame.image.load("assets/jellyFish/red.png").convert_alpha()
-jellyFishRedMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+jellyFishRedInBubble = pygame.image.load("assets/jellyFish/redBubbled.png").convert_alpha()
+jellyFishRedMoveInBubble = pygame.image.load("assets/jellyFish/red-moveBubbled.png").convert_alpha()
 
 jellyFishBlue = pygame.image.load("assets/jellyFish/blue.png").convert_alpha()
-jellyFishBlueMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
-jellyFishBlueInBubble = pygame.image.load("assets/jellyFish/blue.png").convert_alpha()
-jellyFishBlueMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+jellyFishBlueMove = pygame.image.load("assets/jellyFish/blue-move.png").convert_alpha()
+jellyFishBlueInBubble = pygame.image.load("assets/jellyFish/blueBubbled.png").convert_alpha()
+jellyFishBlueMoveInBubble = pygame.image.load("assets/jellyFish/blue-moveBubbled.png").convert_alpha()
 
 jellyFishGreen = pygame.image.load("assets/jellyFish/green.png").convert_alpha()
-jellyFishGreenMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
-jellyFishGreenInBubble = pygame.image.load("assets/jellyFish/green.png").convert_alpha()
-jellyFishGreenMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+jellyFishGreenMove = pygame.image.load("assets/jellyFish/green-move.png").convert_alpha()
+jellyFishGreenInBubble = pygame.image.load("assets/jellyFish/greenBubbled.png").convert_alpha()
+jellyFishGreenMoveInBubble = pygame.image.load("assets/jellyFish/green-moveBubbled.png").convert_alpha()
 
 jellyFishPurple = pygame.image.load("assets/jellyFish/purple.png").convert_alpha()
-jellyFishPurpleMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
-jellyFishPurpleInBubble = pygame.image.load("assets/jellyFish/purple.png").convert_alpha()
-jellyFishPurpleMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+jellyFishPurpleMove = pygame.image.load("assets/jellyFish/purple-move.png").convert_alpha()
+jellyFishPurpleInBubble = pygame.image.load("assets/jellyFish/purpleBubbled.png").convert_alpha()
+jellyFishPurpleMoveInBubble = pygame.image.load("assets/jellyFish/purple-moveBubbled.png").convert_alpha()
 
 jellyFishBrown = pygame.image.load("assets/jellyFish/brown.png").convert_alpha()
-jellyFishBrownMove = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
-jellyFishBrownInBubble = pygame.image.load("assets/jellyFish/brown.png").convert_alpha()
-jellyFishBrownMoveInBubble = pygame.image.load("assets/jellyFish/red-move.png").convert_alpha()
+jellyFishBrownMove = pygame.image.load("assets/jellyFish/brown-move.png").convert_alpha()
+jellyFishBrownInBubble = pygame.image.load("assets/jellyFish/brownBubbled.png").convert_alpha()
+jellyFishBrownMoveInBubble = pygame.image.load("assets/jellyFish/brown-moveBubbled.png").convert_alpha()
 
 # Plastics
 bottle = pygame.image.load("assets/plastics/bottle.png").convert_alpha()

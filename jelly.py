@@ -21,7 +21,7 @@ class Jelly(pygame.sprite.Sprite):
         self.image = self.jellyColours[self.jellyType]
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(WIDTH - self.rect.width)
-        self.rect.y = random.randrange(1000, 1200)
+        self.rect.y = random.randrange(1000, 1300)
         self.speedy = random.randrange(2, 5)
         self.mask = pygame.mask.from_surface(self.image)
         self.inBubble = False
