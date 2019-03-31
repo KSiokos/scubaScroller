@@ -14,7 +14,7 @@ class greyRocks(pygame.sprite.Sprite):
         self.rect.y = y
         self.speedy = 3
         self.originY = y
-        self.mask = pygame.mask.from_surface(self.image)
+        self.mask = pygame.mask.from_surface(self.image, 127)
     def update(self):
         self.rect.y -= self.speedy
         if self.rect.bottom <= 0:
